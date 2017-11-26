@@ -2,7 +2,27 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import './index.css';
 
-function Square(props: any) {
+interface GameSquare {
+  value: String;
+  onClick: () => void;
+}
+
+interface GameBoard {
+  squares: String[];
+  onClick: (n: number) => void;
+}
+
+interface GameHistory {
+  squares: String[];
+}
+
+interface GameState {
+  history: GameHistory[];
+  stepNumber: number;
+  xIsNext: Boolean;
+}
+
+function Square(props: GameSquare) {
   return (
     <button className="square" onClick={() => props.onClick()}>
       {props.value}
@@ -10,9 +30,9 @@ function Square(props: any) {
   );
 }
 
-class Board extends React.Component<any, any> {
+class Board extends React.Component<GameBoard, {}> {
 
-  renderSquare(i: any) {
+  renderSquare(i: number) {
     return(
       <Square
         value={this.props.squares[i]}
@@ -43,8 +63,8 @@ class Board extends React.Component<any, any> {
   }
 }
 
-class Game extends React.Component<any, any> {
-  constructor(props: any) {
+class Game extends React.Component<{}, GameState> {
+  constructor(props: GameState) {
     super(props);
     this.state = {
       history: [{
@@ -55,14 +75,14 @@ class Game extends React.Component<any, any> {
     };
   }
 
-  jumpTo(step: any) {
+  jumpTo(step: number) {
     this.setState({
       stepNumber: step,
       xIsNext: (step % 2) === 0,
     });
   }
 
-  handleClick(i: any) {
+  handleClick(i: number) {
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
@@ -84,7 +104,7 @@ class Game extends React.Component<any, any> {
 
   render() {
 
-    const history: any[] = this.state.history;
+    const history: GameHistory[] = this.state.history;
     const current = history[this.state.stepNumber];
     const winner = calculateWinner(current.squares);
 
@@ -111,7 +131,7 @@ class Game extends React.Component<any, any> {
         <div className="game-board">
           <Board
             squares={current.squares}
-            onClick={(i: any) => this.handleClick(i)}
+            onClick={(i: number) => this.handleClick(i)}
           />
         </div>
         <div className="game-info">
@@ -123,7 +143,7 @@ class Game extends React.Component<any, any> {
   }
 }
 
-function calculateWinner(squares: any[]) {
+function calculateWinner(squares: String[]) {
   const lines = [
     [0, 1, 2],
     [3, 4, 5],
